@@ -1,129 +1,311 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+# 1. Write a python class to convert an integer into a roman numeral and viceversa
+class RomanNumeralConverter:
+ class RomanNumeralConverter:
+    def __init__(self):
+        self.roman_numerals = {
+            1000: 'M',
+            900: 'CM',
+            500: 'D',
+            400: 'CD',
+            100: 'C',
+            90: 'XC',
+            50: 'L',
+            40: 'XL',
+            10: 'X',
+            9: 'IX',
+            5: 'V',
+            4: 'IV',
+            1: 'I'
+        }
+        
+    def to_roman_numeral(self, number):
+        result = ''
+        for value, numeral in self.roman_numerals.items():
+            while number >= value:
+                result += numeral
+                number -= value
+        return result
+    
+    def from_roman_numeral(self, roman_numeral):
+        result = 0
+        for value, numeral in reversed(list(self.roman_numerals.items())):
+            while roman_numeral.startswith(numeral):
+                result += value
+                roman_numeral = roman_numeral[len(numeral):]
+        return result
+        
+converter = RomanNumeralConverter()
 
-# C extensions
-*.so
+# Convert integer to Roman numeral
+roman_numeral = converter.to_roman_numeral(1234)
+print(roman_numeral) 
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+# Convert Roman numeral to integer
+number = converter.from_roman_numeral('MCCXXXIV')
+print(number) # 1234
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+# 2  Write a Python class to find validity of a string of parentheses, '(', ')', '{', '}', '[' and ']. These brackets must be close in the correct order, for example "()" and "()[]{}" are valid but "[)", "({[)]" and "{{{" are invalid. 
+class ParenthesesValidator:
+    def is_valid(self, s: str) -> bool:
+        stack = []
+        parentheses_map = {')': '(', '}': '{', ']': '['}
+        
+        for char in s:
+            if char in parentheses_map:
+                top_element = stack.pop() if stack else '#'
+                if parentheses_map[char] != top_element:
+                    return False
+            else:
+                stack.append(char)
+                
+        return not stack
+validator = ParenthesesValidator()
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+# Valid parentheses
+print(validator.is_valid("()")) # True
+print(validator.is_valid("()[]{}")) # True
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
+# Invalid parentheses
+print(validator.is_valid("(]")) # False
+print(validator.is_valid("([)]")) # False
+print(validator.is_valid("{[]}")) # False
 
-# Translations
-*.mo
-*.pot
+# 3 Write a Python class to get all possible unique subsets from a set of distinct integers Input : [4, 5, 6] Output : [[], [6], [5], [5, 6], [4], [4, 6], [4, 5], [4, 5, 6]] 
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+from typing import List
 
-# Flask stuff:
-instance/
-.webassets-cache
+class SubsetGenerator:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        result = [[]]
+        for num in sorted(nums):
+            result += [item + [num] for item in result]
+        return result
+generator = SubsetGenerator()
 
-# Scrapy stuff:
-.scrapy
+# Example usage
+nums = [4, 5, 6]
+print(generator.subsets(nums))
+# Output: [[], [4], [5], [4, 5], [6], [4, 6], [5, 6], [4, 5, 6]]
 
-# Sphinx documentation
-docs/_build/
+# 4 Write a Python class to find a pair of elements (indices of the two numbers) from a given array whose sum equals a specific target number. Note: There will be one solution for each input and do not use the same element twice. Input: numbers= [90, 20,10,40,50,60,70], target=50 Output: 3, 4 
+from typing import List, Tuple
 
-# PyBuilder
-target/
+class SumPairFinder:
+    def find_pair(self, numbers: List[int], target: int) -> Tuple[int, int]:
+        lookup = {}
+        for i, num in enumerate(numbers):
+            complement = target - num
+            if complement in lookup:
+                return (lookup[complement], i)
+            lookup[num] = i
+        return None
+finder = SumPairFinder()
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# Example usage
+numbers = [90, 20, 10, 40, 50, 60, 70]
+target = 50
+print(finder.find_pair(numbers, target))
+# Output: (3, 4)
 
-# IPython
-profile_default/
-ipython_config.py
+# 5 Write a Python class to find the three elements that sum to zero from a set of n real numbers. Input array : [-25, -10, -7, -3, 2, 4, 8, 10] Output : [[-10, 2, 8], [-7, -3, 10]] 
+from typing import List
 
-# pyenv
-.python-version
+class ThreeSumFinder:
+    def three_sum(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        result = []
+        for i in range(len(nums) - 2):
+            if i > 0 and nums[i] == nums[i-1]:
+                continue
+            j, k = i+1, len(nums)-1
+            while j < k:
+                total = nums[i] + nums[j] + nums[k]
+                if total < 0:
+                    j += 1
+                elif total > 0:
+                    k -= 1
+                else:
+                    result.append([nums[i], nums[j], nums[k]])
+                    while j < k and nums[j] == nums[j+1]:
+                        j += 1
+                    while j < k and nums[k] == nums[k-1]:
+                        k -= 1
+                    j += 1
+                    k -= 1
+        return result
+finder = ThreeSumFinder()
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
+# Example usage
+nums = [-25, -10, -7, -3, 2, 4, 8, 10]
+print(finder.three_sum(nums))
+# Output: [[-10, 2, 8], [-7, -3, 10]]
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
+# 6 Write a Python class to implement pow(x, n) 
+  class Power:
+    def pow(self, x: float, n: int) -> float:
+        if n < 0:
+            x = 1 / x
+            n = -n
+        result = 1
+        while n > 0:
+            if n % 2 == 1:
+                result *= x
+            x *= x
+            n //= 2
+        return result
+p = Power()
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+# Example usage
+print(p.pow(2, 3))  # Output: 8.0
+print(p.pow(2, -3))  # Output: 0.125
 
-# SageMath parsed files
-*.sage.py
+# 7 Write a Python class to reverse a string word by word. Input string : 'hello .py' Expected Output : '.py hello' 
+class StringReverser:
+    def reverse_words(self, s: str) -> str:
+        words = s.split()
+        words.reverse()
+        return ' '.join(words)
+reverser = StringReverser()
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+# Example usage
+s = 'hello .py'
+print(reverser.reverse_words(s))  # Output: '.py hello'
 
-# Spyder project settings
-.spyderproject
-.spyproject
+# 8 Write a python class which has 2 methods get_string and print_string. get_string takes a string from the user and print_string prints the string in reverse order 
+  class StringReverser:
+    def __init__(self):
+        self.string = ""
 
-# Rope project settings
-.ropeproject
+    def get_string(self):
+        self.string = input("Enter a string: ")
 
-# mkdocs documentation
-/site
+    def print_string(self):
+        print(self.string[::-1])
+reverser = StringReverser()
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+# Example usage
+reverser.get_string()
+reverser.print_string()
 
-# Pyre type checker
-.pyre/
+# 9 Write a Python class named Circle constructed by a radius and two methods which will compute the area and the perimeter of a circle. 
+import math
+
+class Circle:
+    def __init__(self, radius: float):
+        self.radius = radius
+
+    def area(self) -> float:
+        return math.pi * self.radius ** 2
+
+    def perimeter(self) -> float:
+        return 2 * math.pi * self.radius
+circle = Circle(5)
+
+# Example usage
+print(circle.area())  # Output: 78.53981633974483
+print(circle.perimeter())  # Output: 31.41592653589793
+
+# 10 Write a Python program to get the class name of an instance in Python.
+class MyClass:
+    pass
+
+obj = MyClass()
+print(type(obj).__name__)
+
+
+# LAMBDA
+
+# 1 Write a Python program to create a lambda function that adds 15 to a given number passed in as an argument, also create a lambda function that multiplies argument x with argument y and print the result.Sample Output: 25 48 
+  add_fifteen = lambda x: x + 15
+print(add_fifteen(10))
+
+multiply = lambda x, y: x * y
+print(multiply(6, 8))
+
+# 2 Write a Python program to sort a list of tuples using Lambda. Original list of tuples: [('English', 88), ('Science', 90), ('Maths', 97), ('Social sciences', 82)]Sorting the List of Tuples: [('Social sciences', 82), ('English', 88), ('Science', 90), ('Maths', 97)]
+subjects = [('English', 88), ('Science', 90), ('Maths', 97), ('Social sciences', 82)]
+sorted_subjects = sorted(subjects, key=lambda x: x[1])
+print("Original list of tuples:", subjects)
+print("Sorting the List of Tuples:", sorted_subjects)
+
+#Original list of tuples: [('English', 88), ('Science', 90), ('Maths', 97), ('Social sciences', 82)]
+#Sorting the List of Tuples: [('Social sciences', 82), ('English', 88), ('Science', 90), ('Maths', 97)]
+
+# 3 Write a Python program to sort a list of dictionaries using Lambda. 
+phones = [{'make': 'Nokia', 'model': 216, 'color': 'Black'}, {'make': 'Mi Max', 'model': '2', 'color': 'Gold'}, {'make': 'Samsung', 'model': 7, 'color': 'Blue'}]
+sorted_phones = sorted(phones, key=lambda x: x['make'])
+print("Original list of dictionaries:", phones)
+print("Sorting the List of dictionaries:", sorted_phones)
+#Original list of dictionaries: [{'make': 'Nokia', 'model': 216, 'color': 'Black'}, {'make': 'Mi Max', 'model': '2', 'color': 'Gold'}, {'make': 'Samsung', 'model': 7, 'color': 'Blue'}]
+#Sorting the List of dictionaries: [{'make': 'Mi Max', 'model': '2', 'color': 'Gold'}, {'make': 'Nokia', 'model': 216, 'color': 'Black'}, {'make': 'Samsung', 'model': 7, 'color': 'Blue'}]
+
+# 4 Write a Python program to find if a given string starts with a given character using Lambda.
+starts_with = lambda s, c: s[0] == c
+print(starts_with("apple", "a"))
+print(starts_with("banana", "a"))
+
+#5 Write a Python program to check whether a given string is number or not using Lambda. 
+is_number = lambda s: s.isnumeric()
+print(is_number("123"))
+print(is_number("abc"))
+
+# 6 Write a Python program to find numbers divisible by nineteen or thirteen from a list of numbers using Lambda 
+lst = [19, 65, 57, 39, 152, 639, 121, 44, 90, 190]
+result = list(filter(lambda x: x%19==0 or x%13==0, lst))
+print(result)
+
+Output:
+[19, 65, 57, 39, 152, 190] 
+
+# 7 Write a Python program to sort a given matrix in ascending order according to the sum of its rows using lambda. 
+matrix = [[1, 2, 3], [2, 4, 5], [1, 1, 1]]
+sorted_matrix = sorted(matrix, key=lambda row: sum(row))
+print("Original Matrix:", matrix)
+print("Sort the said matrix in ascending order according to the sum of its rows", sorted_matrix)
+
+matrix = [[1, 2, 3], [-2, 4, -5], [1, -1, 1]]
+sorted_matrix = sorted(matrix, key=lambda row: sum(row))
+print("Original Matrix:", matrix)
+print("Sort the said matrix in ascending order according to the sum of its rows", sorted_matrix)
+
+Original Matrix: [[1, 2, 3], [2, 4, 5], [1, 1, 1]]
+Sort the said matrix in ascending order according to the sum of its rows [[1, 1, 1], [1, 2, 3], [2, 4, 5]]
+
+Original Matrix: [[1, 2, 3], [-2, 4, -5], [1, -1, 1]]
+Sort the said matrix in ascending order according to the sum of its rows [[-2, 4, -5], [1, -1, 1], [1, 2, 3]]
+
+
+# 8 Write a Python program to check whether a given string contains a capital letter, a lower case letter, a number and a minimum length using lambda. Minimum length : 10 input string: PaceWisd0m o/p: valid string 
+check_string = lambda s: len(s)>=10 and any(c.isupper() for c in s) and any(c.islower() for c in s) and any(c.isdigit() for c in s)
+
+# Example usage
+input_string = 'PaceWisd0m'
+if check_string(input_string):
+    print('Valid string')
+else:
+    print('Invalid string')
+
+Valid string
+
+#9 Write a Python program to find the elements of a given list of strings that contain specific substring using lambda. 
+string_list = ['red', 'black', 'white', 'green', 'orange']
+substring1 = 'ack'
+substring2 = 'abc'
+
+result1 = list(filter(lambda x: substring1 in x, string_list))
+result2 = list(filter(lambda x: substring2 in x, string_list))
+
+print("Elements of the said list that contain substring", substring1, ":", result1)
+print("Elements of the said list that contain substring", substring2, ":", result2)
+ 
+
+# 10 Write a Python program to sort a given mixed list of integers and strings using lambda. Numbers must be sorted before strings. 
+original_list = [19, 'red', 12, 'green', 'blue', 10, 'white', 'green', 1]
+sorted_list = sorted(original_list, key=lambda x: (isinstance(x, str), x))
+print("Original list:", original_list)
+print("Sorted list:", sorted_list)
+Original list: [19, 'red', 12, 'green', 'blue', 10, 'white', 'green', 1]
+Sorted list: [1, 10, 12, 19, 'blue', 'green', 'green', 'red', 'white']
+
+
+
